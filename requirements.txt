@@ -1,0 +1,5 @@
+python-telegram-bot>=13.11
+yt-dlp>=2022.6.29
+loguru
+botocore
+boto3

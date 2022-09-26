@@ -1,0 +1,9 @@
+{
+   "TargetValue":10,
+   "CustomizedMetricSpecification":{
+      "MetricName":"backlog_per_instance",
+      "Namespace":"Alexey_Dima_polybot_metric/AutoScaling",
+      "Statistic":"Average",
+      "Unit":"Count"
+   }
+}
