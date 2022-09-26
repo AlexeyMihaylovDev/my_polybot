@@ -1,0 +1,18 @@
+pipeline {
+    agent {
+        docker { image '352708296901.dkr.ecr.eu-central-1.amazonaws.com/alexey_jenk_agent:latest'
+                label 'linux'
+                args  '--user root -v /var/run/docker.sock:/var/run/docker.sock' }
+    }
+    stages {
+        stage('Test') {
+            steps {
+                sh 'docker ps'
+                sh 'aws ecr get-login-password --region eu-central-1 | docker login --username AWS --password-stdin 352708296901.dkr.ecr.eu-central-1.amazonaws.com'
+                sh 'docker ps'
+                sh 'docker build'
+
+            }
+        }
+    }
+}

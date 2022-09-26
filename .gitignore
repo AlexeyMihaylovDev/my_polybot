@@ -4,7 +4,7 @@
 __pycache__/
 *.py[cod]
 *$py.class
-terraform*
+
 secret/
 # C extensions
 *.so
@@ -144,7 +144,7 @@ pip-selfcheck.json
 ## Plugin-specific files:
 
 # IntelliJ
-/out/
+
 
 # mpeltonen/sbt-idea plugin
 .idea_modules/

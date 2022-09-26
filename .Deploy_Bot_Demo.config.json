@@ -1,0 +1,10 @@
+{
+    "name": "Deploy_Bot_Demo",
+    "params": {
+        "HEADER": "",
+        "Build_Type": "",
+        "JOB_EXECUTOR": "System",
+        "JOB_EXECUTOR_ID": "System",
+        "Deploy": true
+    }
+}

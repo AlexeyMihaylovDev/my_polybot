@@ -1,0 +1,10 @@
+{
+    "name": "deploy-build-vscode",
+    "params": {
+        "HEADER": "",
+        "Build_Type": "auto_trigger",
+        "JOB_EXECUTOR": "System",
+        "JOB_EXECUTOR_ID": "System",
+        "Deploy": false
+    }
+}
