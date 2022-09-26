@@ -53,12 +53,13 @@ pipeline {
         timestamps()
     }
 
-    agent {
-        docker { image '352708296901.dkr.ecr.eu-central-1.amazonaws.com/alexey_jenk_agent:ubuntu'
-                label 'linux'
-                args  '--user root -v /var/run/docker.sock:/var/run/docker.sock' }
+ agent { 
+    docker {
+            label 'linux'
+            image '352708296901.dkr.ecr.eu-central-1.amazonaws.com/alexey_jenk_agent:1'
+            args  '--user root -v /var/run/docker.sock:/var/run/docker.sock'
+         }
     }
-
 
     environment {
         ANSIBLE_HOST_KEY_CHECKING = "False"
@@ -92,9 +93,10 @@ pipeline {
             }
         }
         stage('Inputs') {
-             when{ expression { params.Build_Type != "auto_trigger"}}
             steps {
                 script {
+                    // if (currentBuild.getBuildCauses('hudson.model.Cause$UserIdCause')['userId']) {
+                    if (!params.Build_Type == "auto_trigger"){
                         println("===================================${STAGE_NAME}=============================================")
                         String modul_tag = JOB.allModules.collect {
                             "${it.getKey()} - (latest_tag:  ${it.getValue().last_tagName})"
@@ -117,25 +119,19 @@ pipeline {
                         JOB.deploy = userInput['Continue_Deploy']
 
                         println(JOB.params.modules)
-                }
-                      
-            }
-        }
-        
-         stage('Auto input') {
-                         when{ expression { params.Build_Type == "auto_trigger"}}
-
-            steps {
-                script {
+                    } else {
                         JOB.params.Build_Type = "Build_Type_automaticly"
                         JOB.params.modules = "BOT - (latest_tag:  )"
                         JOB.tagName = "${env.BUILD_NUMBER}"
                         JOB.deploy = params.Deploy
                         JOB.tagName = env.BUILD_NUMBER
+
                         println(JOB.params.modules)
+                    }
+
                 }
             }
-         }
+        }
         stage('Set Additional Parameters') {
  
             steps {
@@ -151,9 +147,12 @@ pipeline {
                 }
             }
         }
+
         stage('Clone') {
              steps {
-                script {               
+                script {
+                    // Delete Workspace
+                    cleanWs()
                     // Clone PolyBot repository.
                     git branch: "${JOB.branch}", credentialsId: "${JOB.devops_sys_user}", url: 'git@github.com:AlexeyMihaylovDev/PolyBot.git'
                     JOB.gitCommitHash = global_gitInfo.getCommitHash(JOB.branch)
@@ -163,6 +162,7 @@ pipeline {
         
         }
         stage("set git tag") {
+
             steps {
                 script {
                     JOB.commitAuthor = global_gitInfo.getCommitAuthor()
@@ -197,18 +197,12 @@ pipeline {
     stage("Install Ansible") {      
         when{ expression { JOB.deploy == true}}
         steps {
-            sh''' 
-              apt-get update && \
-              apt-get install -y ansible
-            '''
-
+//                sh 'python3 -m pip install ansible'
             sh '/usr/bin/ansible-galaxy collection install community.general'
         }
     }
 
     stage("Generate Ansible Inventory") {
-                when{ expression { JOB.deploy == true}}
-
         steps {
             sh 'aws ec2 describe-instances --region $BOT_EC2_REGION --filters "Name=tag:App,Values=$BOT_EC2_APP_TAG" --query "Reservations[].Instances[]" > hosts.json'
             sh 'python3 prepare_ansible_inv.py'
@@ -239,6 +233,9 @@ post {
 
     always {
         script {
+            if(JOB.deploy == true){
+                sh '$(docker images | grep amazonaws.com | tr -s ' ' | cut -d ' ' -f 3)'
+            }
             currentBuild.description = ("Branch : ${JOB.branch}\n GitCommiter : ${JOB.commitAuthor}\nDeploy_server: ${JOB.deploy}")
 
             EMAIL_MAP = [
