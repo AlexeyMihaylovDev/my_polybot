@@ -31,7 +31,7 @@ import groovy.transform.Field
 
 JOB.git_project_url = "git@github.com:AlexeyMihaylovDev/PolyBot.git"
 JOB.project_name = "PolyBot"
-JOB.devops_sys_user = "bot_user"
+JOB.devops_sys_user = "my_polybot_key"
 JOB.branch = "main"
 JOB.ssh_key = "ubuntu_ssh"
 JOB.email_recepients = "mamtata2022@gmail.com" //TODO: add all developers of projects
