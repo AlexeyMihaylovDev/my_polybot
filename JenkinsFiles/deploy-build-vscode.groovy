@@ -163,7 +163,8 @@ pipeline {
             steps {
                 script {
                     // Clone PolyBot repository.
-                    git branch: "${JOB.branch}", credentialsId: "${JOB.devops_sys_user}", url: 'git@github.com:AlexeyMihaylovDev/PolyBot.git'
+//                    git branch: "${JOB.branch}", credentialsId: "${JOB.devops_sys_user}", url: 'git@github.com:AlexeyMihaylovDev/PolyBot.git'
+                    git branch: 'main', url: 'https://github.com/AlexeyMihaylovDev/my_polybot.git'
                     JOB.gitCommitHash = global_gitInfo.getCommitHash(JOB.branch)
                     println("====================${JOB.gitCommitHash}==============")
                 }
