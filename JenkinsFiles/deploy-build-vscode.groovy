@@ -148,17 +148,17 @@ pipeline {
                 }
             }
         }
-        stage('download artifacts from S3'){
-            steps{
-                script{
-                    sh '''
-                    aws s3 cp s3://alexey-backet/.telegramToken   app/.telegramToken
-                    aws s3 cp s3://alexey-backet/.envfile   app/.envfile
-                    aws s3 cp s3://alexey-backet/Config2.json   app/Config2.json
-                    '''
-                }
-            }
-        }
+//        stage('download artifacts from S3'){
+//            steps{
+//                script{
+//                    sh '''
+//                    aws s3 cp s3://alexey-backet/.telegramToken   app/.telegramToken
+//                    aws s3 cp s3://alexey-backet/.envfile   app/.envfile
+//                    aws s3 cp s3://alexey-backet/Config2.json   app/Config2.json
+//                    '''
+//                }
+//            }
+//        }
         stage('Clone') {
             steps {
                 script {
