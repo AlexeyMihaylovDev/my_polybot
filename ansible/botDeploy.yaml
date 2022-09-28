@@ -10,7 +10,6 @@
     - name: Run a shell command on a remote host
       shell: sh aws s3 cp s3://alexey-backet/.telegramToken   app/.telegramToken
 
-
     - name: Docker login
       ansible.builtin.shell: |
         aws ecr get-login-password --region {{ registry_region }} | docker login --username AWS --password-stdin {{ registry_url }}
