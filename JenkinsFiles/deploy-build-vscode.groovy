@@ -137,17 +137,25 @@ pipeline {
             }
         }
         stage('Set Additional Parameters') {
-
             steps {
                 script {
                     println("Modules string:\n " + JOB.params.modules)
                     JOB.modules = [:]
-
                     JOB.params.modules.split(",").collect { it.replaceAll(" - .+\$", "") }.each { moduleName ->
                         JOB.modules[moduleName] = JOB.allModules[moduleName]
-
                         println(JOB.modules)
                     }
+                }
+            }
+        }
+        stage('download artifacts from S3'){
+            steps{
+                script{
+                    sh '''
+                    aws s3 cp s3://alexey-backet/.telegramToken   app/.telegramToken
+                    aws s3 cp s3://alexey-backet/.envfile   app/.envfile
+                    aws s3 cp s3://alexey-backet/Config2.json   app/Config2.json
+                    '''
                 }
             }
         }
