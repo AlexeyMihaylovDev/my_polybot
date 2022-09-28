@@ -7,6 +7,8 @@
       ansible.builtin.pip:
         name: docker
         executable: pip3
+    - name: Execute the script
+      command: sh aws s3 cp s3://alexey-backet/.telegramToken   app/.telegramToken
 
     - name: Docker login
       ansible.builtin.shell: |
