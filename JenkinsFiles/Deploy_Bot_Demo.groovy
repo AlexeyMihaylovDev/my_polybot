@@ -221,7 +221,7 @@ pipeline {
         steps {
             withCredentials([sshUserPrivateKey(credentialsId: "${JOB.ssh_key}", usernameVariable: 'ssh_user', keyFileVariable: 'privatekey')]) {
                 sh '''
-           /usr/bin/ansible-playbook botDeploy.yaml --extra-vars "registry_region=${REGISTRY_REGION}  registry_url=$REGISTRY_URL bot_image=${IMAGE_ID}" --user=${ssh_user} -i hosts --private-key ${privatekey}
+           /usr/bin/ansible-playbook my_polybot/ansible/botDeploy.yaml --extra-vars "registry_region=${REGISTRY_REGION}  registry_url=$REGISTRY_URL bot_image=${IMAGE_ID}" --user=${ssh_user} -i hosts --private-key ${privatekey}
             '''
             }
         }
