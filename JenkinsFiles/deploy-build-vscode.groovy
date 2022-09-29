@@ -54,8 +54,9 @@ pipeline {
     }
 
     agent {
-        docker { image '352708296901.dkr.ecr.eu-central-1.amazonaws.com/alexey_jenk_agent:ubuntu'
+        docker {
             label 'aws_linux'
+            image '352708296901.dkr.ecr.eu-central-1.amazonaws.com/alexey_jenk_agent:ubuntu'
             args  '--user root -v /var/run/docker.sock:/var/run/docker.sock' }
     }
 
