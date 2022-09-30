@@ -3,7 +3,7 @@ resource "aws_s3_bucket" "bucket" {
   force_destroy = true
 
   tags = {
-    Name        = "${var.project_name}-bucket2"
+    Name        = "${var.project_name}-terraform"
     Environment = "tf"
   }
 }
@@ -13,23 +13,24 @@ resource "aws_s3_bucket_acl" "buck_acl" {
   acl    = "private"
 }
 
-## Upload an object
-resource "aws_s3_object" "assassinatos" {
-  bucket = aws_s3_bucket.bucket.id
-  key    = "data/.envfile"
-  acl    = "private"
-  source = ".envfile"
-}
+### Upload an object
+#resource "aws_s3_object" "assassinatos" {
+#  bucket = aws_s3_bucket.bucket.id
+#  key    = "data/.envfile"
+#  acl    = "private"
+#  source = ".envfile"
+#}
 resource "aws_s3_object" "telegram" {
   bucket = aws_s3_bucket.bucket.id
   key    = "data/.telegramToken"
   acl    = "private"
-  source = ".telegramToken"
+  source = "E:/project/INTCollege/BotProject/my_polybot/.telegramToken"
 }
 resource "aws_s3_object" "metric" {
   bucket = aws_s3_bucket.bucket.id
   key    = "data/Config2.json"
   acl    = "private"
-  source = "Config2.json"
+  source = "my_polybot/Config2.json"
   #  etag   = filemd5("D:/elements/project/PolyBot/.envfile")
 }
+

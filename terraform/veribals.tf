@@ -38,10 +38,16 @@ variable "bucket_name" {
    default     = "polybotbucket"
 }
 variable "project_name" {
-   default     = "Alexey_Dima_polybot"
+   default     = "polybot"
+}
+variable "key_name" {
+   default     = "polybot"
 }
 
 
 variable "acl_value" {
     default = "private"
+}
+variable "bucket_name_tf" {
+  default     = "terraform-state"
 }

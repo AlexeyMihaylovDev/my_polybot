@@ -8,7 +8,7 @@ resource "aws_autoscaling_group" "Polybot-aws_autoscaling_group" {
   launch_configuration = aws_launch_configuration.launch_config.name
   force_delete         = true
   tag {
-    key                 = "worker-alexey-dima"
+    key                 = var.key_name
     propagate_at_launch = true
     value               = "ec2 instance"
 
@@ -21,11 +21,11 @@ resource "aws_autoscaling_group" "Polybot-aws_autoscaling_group" {
 }
 
 resource "aws_launch_configuration" "launch_config" {
-  image_id        = "ami-044fc6ddbb6094b68"
-  instance_type   = "t2.micro"
-  key_name        = "alexeymihaylov_key"
-  user_data       = file("script_worker.sh")
-  name     = "worker-alexey-dima"
+  image_id      = data.aws_ami.ubuntu.id
+  instance_type = "t2.micro"
+  key_name      = var.key_name
+  #  user_data       = file("script_worker.sh")
+  name            = var.project_name
   security_groups = [aws_security_group.EX1_polybot-secure-group.id]
 
 
@@ -54,3 +54,4 @@ resource "aws_launch_configuration" "launch_config" {
 ##  topic_arn     = "aws_sns_topic.cpu-sns.arn"
 #
 #}
+
