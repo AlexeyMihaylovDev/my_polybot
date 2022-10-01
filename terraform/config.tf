@@ -1,8 +1,8 @@
 terraform {
   backend "s3" {
-    bucket = "terraform-my-project"
+    bucket = var.bucket_name_tf
     key    = "my-terraform-project"
-    region = "eu-central-1"
+    region = var.region
 
   }
 }
