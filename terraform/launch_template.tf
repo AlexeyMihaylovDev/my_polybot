@@ -2,9 +2,9 @@ resource "aws_launch_template" "EX1_polybot_temp" {
   name                   = "${var.project_name}-template"
   image_id               = "ami-044fc6ddbb6094b68" // worker-ami
   instance_type          = "t2.small"
-  key_name               = "alexeymihaylov_key"
+  key_name               = var.key_name
 #  vpc_security_group_ids = [aws_security_group.EX1_polybot-secure-group.id]
-    user_data              = base64encode(data.template_file.test.rendered)
+#    user_data              = base64encode(data.template_file.test.rendered)
 
   tags = {
     Name = "${var.project_name}-scalling"
@@ -29,6 +29,6 @@ resource "aws_launch_template" "EX1_polybot_temp" {
 }
 
 
-data "template_file" "test" {
-  template = file("templet.sh")
-}
+#data "template_file" "test" {
+#  template = file("templet.sh")
+#}
