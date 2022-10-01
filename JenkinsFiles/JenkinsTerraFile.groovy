@@ -13,7 +13,7 @@ import groovy.transform.Field
 JOB.git_project_url = "git@github.com:AlexeyMihaylovDev/PolyBot.git"
 JOB.project_name = "terraform_bot"
 JOB.devops_sys_user = "my_polybot_key"
-JOB.branch = "dev_terraform"
+JOB.branch = "int_terraform"
 JOB.email_recepients = "mamtata2022@gmail.com" //TODO: add all developers of projects
 
 
