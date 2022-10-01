@@ -12,13 +12,13 @@ import groovy.transform.Field
 @Field JOB = [
         allModules: [
                 "BOT": [
-                        dockerfile               : "Dockerfile_bot",
+                        dockerfile               : "Dockerfiles/Dockerfile_bot",
                         tag                      : "",
                         last_tagName             : "",
                         details                  : "bot"
                 ],
                 "WORKER": [
-                        dockerfile               : "Dockerfile_worker",
+                        dockerfile               : "Dockerfiles/Dockerfile_worker",
                         tag                      : "",
                         last_tagName             : "",
                         details                  : "worker"
@@ -150,17 +150,16 @@ pipeline {
                 }
             }
         }
-//        stage('download artifacts from S3'){
-//            steps{
-//                script{
-//                    sh '''
-//                    aws s3 cp s3://alexey-backet/.telegramToken   app/.telegramToken
-//                    aws s3 cp s3://alexey-backet/.envfile   app/.envfile
-//                    aws s3 cp s3://alexey-backet/Config2.json   app/Config2.json
-//                    '''
-//                }
-//            }
-//        }
+        stage('download artifacts from S3'){
+            steps{
+                script{
+                    sh '''
+                    aws s3 cp s3://alexey-backet/.telegramToken   app/.telegramToken
+                    aws s3 cp s3://alexey-backet/Config2.json   app/Config2.json
+                    '''
+                }
+            }
+        }
         stage('Clone') {
             steps {
                 script {
