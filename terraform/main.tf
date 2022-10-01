@@ -6,10 +6,10 @@ provider "aws" {
 }
 terraform {
   backend "s3" {
-    bucket = "terraforstate-backet"
+    bucket = var.bucket_name_tf
     key    = "aws/terraform/terraform.tfstate"
     encrypt = true
-    region = "eu-central-1"
+    region = var.region
   }
 }
 
