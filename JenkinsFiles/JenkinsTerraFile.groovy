@@ -67,7 +67,7 @@ pipeline {
                 script {
                     println("===================================${STAGE_NAME}=============================================")
                     def userInput = input id: 'UserInput', message: 'Please provide parameters.', ok: 'OK', parameters: [
-                            choice(name: 'Build_Type', choices: ['apply', 'destroy', 'plan'], description: '\'APPLY\' - Create framework. \'DESTROY\' - Destroy framework. \'PLAN\' - Show framework.'),
+                            choice(name: 'Build_Type', choices: [ 'plan','destroy'], description: '\'APPLY\' - Create framework. \'DESTROY\' - Destroy framework. \'PLAN\' - Show framework.'),
                             booleanParam(description: 'Click to checkbox if you want to run deploy stages', name: 'Continue_Deploy')
                     ]
                     println("-------------------------Inputs provided by user:--------------------------------")
@@ -95,12 +95,12 @@ pipeline {
                 script {
                     println("===================================${STAGE_NAME} : ${JOB.Build_Type} =============================================")
                     dir('terraform') {
-                        sh 'terraform init -migrate-state'
+                        sh 'terraform init '
                         if (JOB.Build_Type == "plan") {
                             sh "terraform plan -out=myplan.txt   "
                         } else if (JOB.Build_Type == "destroy") {
                             sh "terraform plan -out=myplan.txt   "
-                            sh 'terraform destroy "myplan.txt" '
+                            sh 'terraform destroy -auto-approve '
                         }
                     }
                 }
@@ -113,7 +113,7 @@ pipeline {
                     println("===================================${STAGE_NAME}=============================================")
                     dir('terraform') {
 
-                        sh ' terraform apply "myplan.txt" -auto-approve '
+                        sh ' terraform apply "myplan.txt"'
                     }
                 }
             }
