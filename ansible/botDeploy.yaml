@@ -8,7 +8,7 @@
         name: docker
         executable: pip3
     - name: Run a shell command on a remote host
-      shell: sh aws s3 cp s3://alexey-backet/.telegramToken   app/.telegramToken
+      shell:  aws s3 cp s3://alexey-backet/.telegramToken   app/.telegramToken
 
     - name: Docker login
       ansible.builtin.shell: |
@@ -17,6 +17,6 @@
       community.general.docker_container:
         image: "{{ bot_image }}"
         name: bot
-        volumes: /home/ubuntu/app/:/app/secret
+        volumes: /home/ec2-user/app/:/app/secret
         state: started
         restart_policy: always
