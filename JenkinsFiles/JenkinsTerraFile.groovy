@@ -36,7 +36,7 @@ pipeline {
     }
 
     agent {
-        docker { image '276105822531.dkr.ecr.eu-central-1.amazonaws.com/jenk_agent:3'
+        docker { image '352708296901.dkr.ecr.eu-central-1.amazonaws.com/alexey_jenk_agent:ubuntu'
             label 'linux'
             args  '--user root -v /var/run/docker.sock:/var/run/docker.sock' }
     }
@@ -67,7 +67,7 @@ pipeline {
                 script {
                     println("===================================${STAGE_NAME}=============================================")
                     def userInput = input id: 'UserInput', message: 'Please provide parameters.', ok: 'OK', parameters: [
-                            choice(name: 'Build_Type', choices: [ 'plan','destroy'], description: '\'APPLY\' - Create framework. \'DESTROY\' - Destroy framework. \'PLAN\' - Show framework.'),
+                            choice(name: 'Build_Type', choices: [ 'plan','destroy'], description: '\'DESTROY\' - Destroy framework. \'PLAN\' - Show framework.'),
                             booleanParam(description: 'Click to checkbox if you want to run deploy stages', name: 'Continue_Deploy')
                     ]
                     println("-------------------------Inputs provided by user:--------------------------------")
