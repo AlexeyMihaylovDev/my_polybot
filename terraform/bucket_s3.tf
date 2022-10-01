@@ -20,17 +20,17 @@ resource "aws_s3_bucket_acl" "buck_acl" {
 #  acl    = "private"
 #  source = ".envfile"
 #}
-resource "aws_s3_object" "telegram" {
-  bucket = aws_s3_bucket.bucket.id
-  key    = "data/.telegramToken"
-  acl    = "private"
-  source = "E:/project/INTCollege/BotProject/my_polybot/.telegramToken"
-}
-resource "aws_s3_object" "metric" {
-  bucket = aws_s3_bucket.bucket.id
-  key    = "data/Config2.json"
-  acl    = "private"
-  source = "my_polybot/Config2.json"
-  #  etag   = filemd5("D:/elements/project/PolyBot/.envfile")
-}
+#resource "aws_s3_object" "telegram" {
+#  bucket = aws_s3_bucket.bucket.id
+#  key    = "data/.telegramToken"
+#  acl    = "private"
+#  source = "E:/project/INTCollege/BotProject/my_polybot/.telegramToken"
+#}
+#resource "aws_s3_object" "metric" {
+#  bucket = aws_s3_bucket.bucket.id
+#  key    = "data/Config2.json"
+#  acl    = "private"
+#  source = "my_polybot/Config2.json"
+#  #  etag   = filemd5("D:/elements/project/PolyBot/.envfile")
+#}
 
