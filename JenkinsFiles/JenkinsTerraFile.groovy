@@ -97,10 +97,10 @@ pipeline {
                     dir('terraform') {
                         sh 'terraform init -migrate-state'
                         if (JOB.Build_Type == "plan") {
-                            sh "terraform plan "
-
+                            sh "terraform plan -out=myplan.txt   "
                         } else if (JOB.Build_Type == "destroy") {
-                            sh "terraform destroy –auto-approve "
+                            sh "terraform plan -out=myplan.txt   "
+                            sh 'terraform destroy "myplan.txt" '
                         }
                     }
                 }
@@ -112,7 +112,8 @@ pipeline {
                 script {
                     println("===================================${STAGE_NAME}=============================================")
                     dir('terraform') {
-                        sh "terraform apply –auto-approve"
+
+                        sh ' terraform apply "myplan.txt" -auto-approve '
                     }
                 }
             }
