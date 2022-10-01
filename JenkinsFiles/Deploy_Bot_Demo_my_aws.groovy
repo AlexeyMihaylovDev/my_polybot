@@ -12,16 +12,18 @@ import groovy.transform.Field
 @Field JOB = [
         allModules: [
                 "BOT": [
-                        dockerfile               : "Dockerfile_bot",
+                        dockerfile               : "Dockerfiles/Dockerfile_bot",
                         tag                      : "",
                         last_tagName             : "",
                         details                  : "bot"
+
                 ],
                 "WORKER": [
-                        dockerfile               : "Dockerfile_worker",
+                        dockerfile               : "Dockerfiles/Dockerfile_worker",
                         tag                      : "",
                         last_tagName             : "",
                         details                  : "worker"
+
 
                 ]
         ]
@@ -35,6 +37,7 @@ JOB.devops_sys_user = "my_polybot_key"
 JOB.branch = "main"
 JOB.ssh_key = "ubuntu_ssh"
 JOB.email_recepients = "mamtata2022@gmail.com" //TODO: add all developers of projects
+JOB.ansible_inventory = ""
 
 
 
@@ -54,20 +57,22 @@ pipeline {
     }
 
     agent {
-        docker { image '352708296901.dkr.ecr.eu-central-1.amazonaws.com/alexey_jenk_agent:ubuntu'
-            label 'aws_linux'
+        docker { image '276105822531.dkr.ecr.eu-central-1.amazonaws.com/jenk_agent:1'
+            label 'linux'
             args  '--user root -v /var/run/docker.sock:/var/run/docker.sock' }
     }
 
 
     environment {
         ANSIBLE_HOST_KEY_CHECKING = "False"
-        REGISTRY_URL = "352708296901.dkr.ecr.eu-central-1.amazonaws.com"
+        REGISTRY_URL = "276105822531.dkr.ecr.eu-central-1.amazonaws.com"
         REGISTRY_REGION = "eu-central-1"
-        BOT_ECR_NAME = "alexey_bot_client"
-        IMAGE_ID = "${env.REGISTRY_URL}/alexey_bot_client"
+        BOT_ECR_NAME = "bot_client"
+        IMAGE_ID = "${env.REGISTRY_URL}/${env.BOT_ECR_NAME}"
         BOT_EC2_APP_TAG = "alexey-bot"
         BOT_EC2_REGION = "eu-central-1"
+        ANSIBLE_INVENROTY_PATH = "ansible/botDeploy.yaml"
+        PREPAIR_ANSIBLE_INV_PATH = "ansible/prepare_ansible_inv.py"
     }
     stages {
         stage('Get & Print Job Parameters') {
@@ -137,34 +142,25 @@ pipeline {
             }
         }
         stage('Set Additional Parameters') {
+
             steps {
                 script {
                     println("Modules string:\n " + JOB.params.modules)
                     JOB.modules = [:]
+
                     JOB.params.modules.split(",").collect { it.replaceAll(" - .+\$", "") }.each { moduleName ->
                         JOB.modules[moduleName] = JOB.allModules[moduleName]
+
                         println(JOB.modules)
                     }
                 }
             }
         }
-//        stage('download artifacts from S3'){
-//            steps{
-//                script{
-//                    sh '''
-//                    aws s3 cp s3://alexey-backet/.telegramToken   app/.telegramToken
-//                    aws s3 cp s3://alexey-backet/.envfile   app/.envfile
-//                    aws s3 cp s3://alexey-backet/Config2.json   app/Config2.json
-//                    '''
-//                }
-//            }
-//        }
         stage('Clone') {
             steps {
                 script {
                     // Clone PolyBot repository.
-                    git branch: "${JOB.branch}", credentialsId: "${JOB.devops_sys_user}", url: 'git@github.com:AlexeyMihaylovDev/PolyBot.git'
-//                    git branch: 'main', url: 'https://github.com/AlexeyMihaylovDev/my_polybot.git'
+                    git branch: "${JOB.branch}", credentialsId: "${JOB.devops_sys_user}", url: 'git@github.com:AlexeyMihaylovDev/my_polybot.git'
                     JOB.gitCommitHash = global_gitInfo.getCommitHash(JOB.branch)
                     println("====================${JOB.gitCommitHash}==============")
                 }
@@ -220,7 +216,7 @@ pipeline {
 
             steps {
                 sh 'aws ec2 describe-instances --region $BOT_EC2_REGION --filters "Name=tag:App,Values=$BOT_EC2_APP_TAG" --query "Reservations[].Instances[]" > hosts.json'
-                sh 'python3 prepare_ansible_inv.py'
+                sh 'python3 ${PREPAIR_ANSIBLE_INV_PATH}'
                 sh '''
         echo "Inventory generated"
         cat hosts
@@ -236,7 +232,7 @@ pipeline {
             steps {
                 withCredentials([sshUserPrivateKey(credentialsId: "${JOB.ssh_key}", usernameVariable: 'ssh_user', keyFileVariable: 'privatekey')]) {
                     sh '''
-           /usr/bin/ansible-playbook botDeploy.yaml --extra-vars "registry_region=${REGISTRY_REGION}  registry_url=$REGISTRY_URL bot_image=${IMAGE_ID}" --user=${ssh_user} -i hosts --private-key ${privatekey}
+           /usr/bin/ansible-playbook ${ANSIBLE_INVENROTY_PATH} --extra-vars "registry_region=${REGISTRY_REGION}  registry_url=$REGISTRY_URL bot_image=${IMAGE_ID}" --user=${ssh_user} -i hosts --private-key ${privatekey}
             '''
                 }
             }
