@@ -97,12 +97,12 @@ pipeline {
                     dir('terraform') {
                         sh 'terraform init -migrate-state'
                         if (JOB.Build_Type == "plan") {
-                            sh "terraform ${JOB.Build_Type} "
+                            sh "terraform plan "
 
-                        } else if (JOB.Build_Type == "apply") {
-                            sh "terraform ${JOB.Build_Type} –auto-approve"
-                        } else {
-                            sh "terraform ${JOB.Build_Type} –auto-approve "
+                        } else if (JOB.Build_Type == "destroy"){
+                            sh "terraform destroy –auto-approve "
+                        }else if (JOB.Build_Type == "apply" && JOB.deploy == true){
+
                         }
                     }
                 }
