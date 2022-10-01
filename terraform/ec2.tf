@@ -1,9 +1,8 @@
 
 
-resource "aws_instance" "my_Amazon_linux" {
+resource "aws_instance" "ubuntu_linux" {
   # count                  = var.prefix
-  ami = "ami-0a1ee2fb28fe05df3" #Amazon Linux AMI
-  #  ami                         = "ami-06402f02caa521327" # My Amazon Linux AMI
+  ami                         = aws_ami.ubuntu.id #Amazon Linux AMI
   instance_type               = "t2.medium"
   vpc_security_group_ids      = [aws_security_group.EX1_polybot-secure-group.id]
   subnet_id                   = aws_subnet.public-subnet-2b.id
