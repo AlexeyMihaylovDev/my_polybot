@@ -101,10 +101,17 @@ pipeline {
 
                         } else if (JOB.Build_Type == "destroy"){
                             sh "terraform destroy –auto-approve "
-                        }else if (JOB.Build_Type == "apply" && JOB.deploy == true){
-                            sh "terraform apply –auto-approve "
                         }
                     }
+                }
+            }
+        }
+        stage('Deploy framework on AWS'){
+            when{ expression { JOB.deploy == true}}
+            steps {
+                dir('terraform')
+                script {
+                    sh "terraform apply –auto-approve"
                 }
             }
         }
