@@ -1,5 +1,5 @@
 resource "aws_launch_template" "EX1_polybot_temp" {
-  name                   = "${var.project_name}-template"
+  name                   = "${var.project_name}-template-alexey"
   image_id               = "ami-044fc6ddbb6094b68" // worker-ami
   instance_type          = "t2.small"
   key_name               = var.key_name

@@ -1,5 +1,5 @@
 resource "aws_iam_role" "ec2_role" {
-  name = "ec2_role"
+  name = "ec2_role-tf-alexey"
 
   assume_role_policy = <<EOF
 {
@@ -18,7 +18,7 @@ resource "aws_iam_role" "ec2_role" {
 EOF
 
   tags = {
-    tag-key = "ec2_role"
+    tag-key = "ec2_role-tf-alexey"
   }
 }
 resource "aws_iam_instance_profile" "ec2_profile" {
