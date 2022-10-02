@@ -16,11 +16,12 @@ def prepare_ansible_inventory():
     hosts = []
     for instance in instances:
         instance_name = get_instance_name(instance['Tags'])
-        instance_ip = instance['PublicIpAddress']
-
-        hosts.append(
+        instance_ip = instance.get('PublicIpAddress')
+        if instance_name == "alexey-bot" :
+            hosts.append(
             f"{instance_name} ansible_host={instance_ip}\n"
-        )
+            )
+        else: print("Not found Instance tag alexey-bot")
 
     with open('hosts', 'w') as f:
         f.write('[bot]\n')
