@@ -1,5 +1,5 @@
 {
   "aws_region": "eu-central-1",
-  "bot_to_worker_queue_name": "Alexey_Dima_polybot-sqs-queue",
-  "autoscaling_group_name": "Alexey_Dima_polybot-autoscaling-group"
+  "bot_to_worker_queue_name": "polybot-sqs-alexey",
+  "autoscaling_group_name": "polybot-autoscaling-group"
 }
