@@ -1,5 +1,5 @@
-
 #!/bin/bash
+
 # install docker
 sudo apt-get update
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -

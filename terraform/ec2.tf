@@ -12,7 +12,7 @@ resource "aws_instance" "ubuntu_linux" {
   user_data                   = file("user_data.sh")
   #  depends_on                  = [aws_vpc.vpc, aws_autoscaling_group.Polybot-aws_autoscaling_group]
   tags = {
-    Name        = "${var.project_name}-client"
+    Name        = "alexey-bot"
     environment = "tf"
     App         = "alexey-bot"
 

@@ -3,14 +3,17 @@
   vars:
     ansible_python_interpreter: /usr/bin/python3
   tasks:
-    - name: install pip3
-      apt: name=python3-pip state=present
     - name: Install docker python package
       ansible.builtin.pip:
         name: docker
         executable: pip3
+    - name: Run a shell command on a remote host install aws-cli
+      shell: apt-get  install awscli -y
     - name: Run a shell command on a remote host
       shell:  aws s3 cp s3://alexey-backet/.telegramToken   app/.telegramToken
+    - name: Run a shell command on a remote host install pip3
+      shell:  apt-get install python3-pip -y
+
 
     - name: Docker login
       ansible.builtin.shell: |
