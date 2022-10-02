@@ -21,7 +21,7 @@ def prepare_ansible_inventory():
             hosts.append(
             f"{instance_name} ansible_host={instance_ip}\n"
             )
-        else: print("Not found Instance tag alexey-bot")
+    if len(hosts)==0 : return print("No found Instances by tags name alexey-bot")
 
     with open('hosts', 'w') as f:
         f.write('[bot]\n')
