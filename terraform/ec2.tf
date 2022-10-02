@@ -9,9 +9,10 @@ resource "aws_instance" "ubuntu_linux" {
   associate_public_ip_address = true
   key_name                    = var.key_name
   iam_instance_profile        = aws_iam_instance_profile.ec2_profile.name
+  user_data                   = file("user_data.sh")
   #  depends_on                  = [aws_vpc.vpc, aws_autoscaling_group.Polybot-aws_autoscaling_group]
   tags = {
-    Name        = "${var.project_name} -client"
+    Name        = "${var.project_name}-client"
     environment = "tf"
     App         = "alexey-bot"
 
