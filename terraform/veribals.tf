@@ -51,3 +51,7 @@ variable "acl_value" {
 variable "bucket_name_tf" {
   default     = "terraform-state"
 }
+
+variable "sqs_name" {
+  default     = "polybot-sqs-alexey"
+}

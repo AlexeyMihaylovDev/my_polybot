@@ -8,7 +8,7 @@
   
 
   tags = {
-    Name = "${var.project_name}-sqs-queue"
+    Name = var.sqs_name
     Environment = "production"
   }
 }
