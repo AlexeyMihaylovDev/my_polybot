@@ -221,7 +221,7 @@ pipeline {
             when{ expression { JOB.deploy == true}}
 
             steps {
-                sh 'aws ec2 describe-instances --region $BOT_EC2_REGION --filters "Name=tag:App,Values=$BOT_EC2_APP_TAG,running" --query "Reservations[].Instances[]" > hosts.json'
+                sh 'aws ec2 describe-instances --region $BOT_EC2_REGION --filters "Name=tag:App,Values=$BOT_EC2_APP_TAG,running" --filters Name=instance-state-name,Values=running --query "Reservations[].Instances[]" > hosts.json'
                 sh 'python3 ${PREPAIR_ANSIBLE_INV_PATH}'
                 sh '''
         echo "Inventory generated"
