@@ -17,6 +17,6 @@
       community.general.docker_container:
         image: "{{ bot_image }}"
         name: bot
-        volumes: /home/ec2-user/app/:/app/secret
+        volumes: /home/ubuntu/app/:/app/secret
         state: started
         restart_policy: always

@@ -34,8 +34,8 @@ import groovy.transform.Field
 JOB.git_project_url = "git@github.com:AlexeyMihaylovDev/PolyBot.git"
 JOB.project_name = "PolyBot"
 JOB.devops_sys_user = "my_polybot_key"
-JOB.branch = "main"
-JOB.ssh_key = "ubuntu_ssh"
+JOB.branch = "int_terraform"
+JOB.ssh_key = "ubuntu_bot_instances"
 JOB.email_recepients = "mamtata2022@gmail.com" //TODO: add all developers of projects
 JOB.ansible_inventory = ""
 
@@ -238,7 +238,7 @@ pipeline {
             steps {
                 withCredentials([sshUserPrivateKey(credentialsId: "${JOB.ssh_key}", usernameVariable: 'ssh_user', keyFileVariable: 'privatekey')]) {
                     sh '''
-           /usr/bin/ansible-playbook ${ANSIBLE_INVENROTY_PATH} --extra-vars "registry_region=${REGISTRY_REGION}  registry_url=$REGISTRY_URL bot_image=${IMAGE_ID}" --user=${ssh_user} -i hosts --private-key ${privatekey}
+           /usr/bin/ansible-playbook $ANSIBLE_INVENROTY_PATH --extra-vars "registry_region=$REGISTRY_REGION  registry_url=$REGISTRY_URL bot_image=$IMAGE_ID" --user=${ssh_user} -i hosts --private-key ${privatekey}
             '''
                 }
             }
