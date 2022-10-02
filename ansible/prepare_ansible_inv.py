@@ -16,7 +16,7 @@ def prepare_ansible_inventory():
     hosts = []
     for instance in instances:
         instance_name = get_instance_name(instance['Tags'])
-        instance_ip = instance['PublicIpAddress']
+        instance_ip = instance.get('PublicIpAddress')
 
         hosts.append(
             f"{instance_name} ansible_host={instance_ip}\n"
