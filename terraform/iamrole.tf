@@ -81,7 +81,7 @@ resource "aws_iam_role_policy" "ECR_policy" {
 EOF
 }
 resource "aws_iam_role_policy" "SQS_policy" {
-  name = "ECR_policy"
+  name = "sqs_policy"
   role = aws_iam_role.ec2_role.id
 
   policy = <<EOF
