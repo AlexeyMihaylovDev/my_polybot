@@ -69,13 +69,13 @@ pipeline {
                     def userInput = input id: 'UserInput', message: 'Please provide parameters.', ok: 'OK', parameters: [
                             choice(name: 'Build_Type', choices: [ 'plan','destroy'], description: '\'DESTROY\' - Destroy framework. \'PLAN\' - Show framework.'),
                             booleanParam(description: 'Click the checkbox if you want to run terraform apply', name: 'Continue_apply'),
-                            booleanParam(description: 'Click the checkbox if you want to run Deploy build', name: 'Continue_Deploy')
+                            booleanParam(description: 'Continue to  Deploy build AWS cloud', name: 'Continue_DEPLOY')
 
                     ]
                     println("-------------------------Inputs provided by user:--------------------------------")
                     JOB.Build_Type = userInput["Build_Type"]
                     JOB.apply = userInput['Continue_apply']
-                    JOB.deploy = userInput['Continue_Deploy']
+                    JOB.deploy = userInput['Continue_DEPLOY']
                     println(JOB.params.modules)
                 }
             }

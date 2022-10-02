@@ -1,5 +1,5 @@
  resource "aws_sqs_queue" "terraform_queue" {
-  name                      = "${var.project_name}-sqs-queue"
+  name                      = var.sqs_name
   delay_seconds             = 90
   max_message_size          = 262144
   message_retention_seconds = 345600
