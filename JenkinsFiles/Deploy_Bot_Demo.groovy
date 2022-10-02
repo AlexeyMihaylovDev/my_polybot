@@ -54,6 +54,7 @@ pipeline {
     options {
         buildDiscarder(logRotator(numToKeepStr: '30', artifactNumToKeepStr: '30'))
         timestamps()
+        ansiColor('xterm')
     }
 
     agent {
@@ -122,6 +123,7 @@ pipeline {
                     JOB.deploy = userInput['Continue_Deploy']
 
                     println(JOB.params.modules)
+
                 }
 
             }
@@ -137,7 +139,11 @@ pipeline {
                     JOB.tagName = "${env.BUILD_NUMBER}"
                     JOB.deploy = params.Deploy
                     JOB.tagName = env.BUILD_NUMBER
+
+                    println(JOB.params.Build_Type)
                     println(JOB.params.modules)
+                    println(JOB.deploy)
+                    println(JOB.tagName)
                 }
             }
         }
@@ -202,7 +208,7 @@ pipeline {
         stage("Install Ansible") {
             when{ expression { JOB.deploy == true}}
             steps {
-                sh''' 
+                sh'''
               apt-get update && \
               apt-get install -y ansible
             '''

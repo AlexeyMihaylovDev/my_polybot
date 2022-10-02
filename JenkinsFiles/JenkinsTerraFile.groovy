@@ -68,14 +68,16 @@ pipeline {
                     println("===================================${STAGE_NAME}=============================================")
                     def userInput = input id: 'UserInput', message: 'Please provide parameters.', ok: 'OK', parameters: [
                             choice(name: 'Build_Type', choices: [ 'plan','destroy'], description: '\'DESTROY\' - Destroy framework. \'PLAN\' - Show framework.'),
-                            booleanParam(description: 'Click to checkbox if you want to run deploy stages', name: 'Continue_Deploy')
+                            booleanParam(description: 'Click the checkbox if you want to run terraform apply', name: 'Continue_apply'),
+                            booleanParam(description: 'Click the checkbox if you want to run Deploy build', name: 'Continue_Deploy')
+
                     ]
                     println("-------------------------Inputs provided by user:--------------------------------")
                     JOB.Build_Type = userInput["Build_Type"]
+                    JOB.apply = userInput['Continue_apply']
                     JOB.deploy = userInput['Continue_Deploy']
                     println(JOB.params.modules)
                 }
-
             }
         }
         stage('Clone') {
@@ -107,15 +109,23 @@ pipeline {
             }
         }
         stage('Deploy framework on AWS') {
-            when { expression { JOB.deploy == true } }
+            when { expression { JOB.apply == true } }
             steps {
                 script {
                     println("===================================${STAGE_NAME}=============================================")
                     dir('terraform') {
-
                         sh ' terraform apply "myplan.txt"'
                     }
                 }
+            }
+        }
+        stage('Deploy app on AWS') {
+            when { expression { JOB.deploy == true } }
+            steps {
+                build job:'Deploy_Bot_Demo' , parameters:[
+                        string(name: 'Build_Type',value: 'auto_trigger'),
+                        booleanParam(name: 'Deploy',value:true)
+                ]
             }
         }
     }
@@ -123,14 +133,14 @@ pipeline {
 
         always {
             script {
-                currentBuild.description = ("Branch : ${JOB.branch}\n GitCommiter : ${JOB.commitAuthor}\nDeploy_server: ${JOB.deploy}")
+                currentBuild.description = ("Branch : ${JOB.branch}\n GitCommiter : ${JOB.commitAuthor}\nDeploy_server: ${JOB.apply}")
 
                 EMAIL_MAP = [
                         "Modules"       : JOB.params.modules,
                         "Build Type"    : JOB.params.Build_Type,
                         "Deploy To Env" : JOB.params.Deploy_Environment,
                         "Job Name"      : JOB_NAME,
-                        "Run deploy "   : JOB.deploy,
+                        "Run deploy "   : JOB.apply,
                         "Build Number"  : BUILD_NUMBER,
                         "Git tag Name"  : JOB.tagName,
                         "Branch"        : "${JOB.branch}",

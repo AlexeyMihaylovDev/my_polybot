@@ -116,7 +116,7 @@ pipeline {
                     JOB.params.Build_Type = userInput["Build_Type"]
                     JOB.params.modules = userInput["Modules"]
                     JOB.tagName = userInput['TAG']
-                    JOB.deploy = userInput['Continue_Deploy']
+                    JOB.apply = userInput['Continue_Deploy']
 
                     println(JOB.params.modules)
                 }
@@ -132,7 +132,7 @@ pipeline {
                     JOB.params.Build_Type = "Build_Type_automaticly"
                     JOB.params.modules = "BOT - (latest_tag:  )"
                     JOB.tagName = "${env.BUILD_NUMBER}"
-                    JOB.deploy = params.Deploy
+                    JOB.apply = params.Deploy
                     JOB.tagName = env.BUILD_NUMBER
                     println(JOB.params.modules)
                 }
@@ -205,7 +205,7 @@ pipeline {
             }
         }
         stage("Install Ansible") {
-            when{ expression { JOB.deploy == true}}
+            when{ expression { JOB.apply == true}}
             steps {
                 sh''' 
               apt-get update && \
@@ -217,7 +217,7 @@ pipeline {
         }
 
         stage("Generate Ansible Inventory") {
-            when{ expression { JOB.deploy == true}}
+            when{ expression { JOB.apply == true}}
 
             steps {
                 sh 'aws ec2 describe-instances --region $BOT_EC2_REGION --filters "Name=tag:App,Values=$BOT_EC2_APP_TAG" --query "Reservations[].Instances[]" > hosts.json'
@@ -230,7 +230,7 @@ pipeline {
         }
         stage('Ansible Bot Deploy') {
 
-            when{ expression { JOB.deploy == true}}
+            when{ expression { JOB.apply == true}}
             environment {
                 IMAGE_ID = "${env.REGISTRY_URL}/${env.BOT_ECR_NAME}:${JOB.tagName}"
             }
@@ -249,14 +249,14 @@ pipeline {
 
         always {
             script {
-                currentBuild.description = ("Branch : ${JOB.branch}\n GitCommiter : ${JOB.commitAuthor}\nDeploy_server: ${JOB.deploy}")
+                currentBuild.description = ("Branch : ${JOB.branch}\n GitCommiter : ${JOB.commitAuthor}\nDeploy_server: ${JOB.apply}")
 
                 EMAIL_MAP = [
                         "Modules"       : JOB.params.modules,
                         "Build Type"    : JOB.params.Build_Type,
                         "Deploy To Env" : JOB.params.Deploy_Environment,
                         "Job Name"      : JOB_NAME,
-                        "Run deploy "   : JOB.deploy,
+                        "Run deploy "   : JOB.apply,
                         "Build Number"  : BUILD_NUMBER,
                         "Git tag Name"  : JOB.tagName,
                         "Branch"        : "${JOB.branch}",
