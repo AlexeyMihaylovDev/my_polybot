@@ -3,6 +3,8 @@
   vars:
     ansible_python_interpreter: /usr/bin/python3
   tasks:
+    - name: install pip3
+      apt: name=python3-pip state=present
     - name: Install docker python package
       ansible.builtin.pip:
         name: docker
