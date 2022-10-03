@@ -173,6 +173,17 @@ pipeline {
             }
 
         }
+        stage('SonarQube analysis') {
+            steps {
+                script {
+                    scannerHome = tool 'SonarScanner'
+                }
+                withSonarQubeEnv('SonarQube Scanner') {
+                    sh "${scannerHome}/bin/sonar-scanner"
+
+                }
+            }
+        }
         stage("set git tag") {
             steps {
                 script {
