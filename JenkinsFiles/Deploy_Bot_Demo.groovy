@@ -58,9 +58,8 @@ pipeline {
     }
 
     agent {
-        docker { image '352708296901.dkr.ecr.eu-central-1.amazonaws.com/alexey_jenk_agent:ubuntu'
-            label 'linux'
-            args  '--user root -v /var/run/docker.sock:/var/run/docker.sock' }
+       node{
+            label 'linux' }
     }
 
 
@@ -173,17 +172,20 @@ pipeline {
             }
 
         }
-        stage('SonarQube analysis') {
+        stage('Code analysis by sonar') {
+            when{ expression { params.Build_Type == "DAILY"}}
             steps {
                 script {
-                    scannerHome = tool 'SonarScanner'
-                }
-                withSonarQubeEnv('SonarScanner') {
-                    sh "${scannerHome}/bin/sonar-scanner"
+                    println("===================================${STAGE_NAME}=============================================")
 
+                    def scannerHome = tool 'SonarScanner'
+                    withSonarQubeEnv('SonarScanner') {
+                        sh "${scannerHome}/bin/sonar-scanner"
+                    }
                 }
             }
         }
+
         stage("set git tag") {
             steps {
                 script {
