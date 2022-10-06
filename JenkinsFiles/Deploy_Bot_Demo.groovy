@@ -58,9 +58,13 @@ pipeline {
     }
 
     agent {
-       node{
-            label 'linux' }
+        docker {
+            label 'linux'
+            image '352708296901.dkr.ecr.eu-central-1.amazonaws.com/alexey_jenk_agent:ubuntu'
+            args  '--user root -v /var/run/docker.sock:/var/run/docker.sock'
+        }
     }
+
 
 
     environment {
@@ -222,8 +226,8 @@ pipeline {
             when{ expression { JOB.deploy == true}}
             steps {
                 sh'''
-            sudo  apt-get update && \
-            sudo  apt-get install -y ansible
+              apt-get update && \
+              apt-get install -y ansible
             '''
 
                 sh '/usr/bin/ansible-galaxy collection install community.general'
