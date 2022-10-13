@@ -36,6 +36,7 @@ RUN unzip terraform_1.3.1_linux_amd64.zip
 
 
 
+
 FROM jenkins/agent
 COPY --from=docker /usr/local/bin/docker /usr/local/bin/
 COPY --from=installer /usr/local/aws-cli/ /usr/local/aws-cli/
