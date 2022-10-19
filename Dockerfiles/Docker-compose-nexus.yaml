@@ -1,0 +1,16 @@
+version: '3.5'
+services:
+  jenkins:
+      image: "jenkins/jenkins:lts"
+      ports:
+        - "10380:8080"
+      restart: "always"
+      volumes:
+        - "./jenkins:/var/jenkins_home"
+  nexus:
+      image: "sonatype/nexus3"
+      ports:
+        - "10680:8081"
+      restart: "always"
+      volumes:
+        - "./nexus:/nexus-data"

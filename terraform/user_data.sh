@@ -16,3 +16,5 @@ usermod -aG docker ubuntu
 sudo apt-get install python3-pip -y
 
 sudo apt-get  install awscli -y
+
+sudo apt  install docker-compose -y
