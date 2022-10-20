@@ -58,13 +58,9 @@ pipeline {
     }
 
     agent {
-        docker {
-            label 'linux'
-            image '352708296901.dkr.ecr.eu-central-1.amazonaws.com/alexey_jenk_agent:ubuntu'
-            args  '--user root -v /var/run/docker.sock:/var/run/docker.sock'
-        }
+        node{
+            label 'linux' }
     }
-
 
 
     environment {
@@ -117,15 +113,13 @@ pipeline {
                              script: [$class: 'GroovyScript', fallbackScript: [classpath: [], oldScript: '', sandbox: true, script: 'return [\'error\']'],
                                       script: [classpath: [], oldScript: '', sandbox: true, script: '''return last_tag.split(",").toList()'''.toString()
                                       ]]],
-                            booleanParam(description: 'Click to checkbox if you want to run deploy stages', name: 'Continue_Deploy'),
-                            booleanParam(description: 'Run Code analysis SonarQube', name: 'sonar_code_analysis')
+                            booleanParam(description: 'Click to checkbox if you want to run deploy stages', name: 'Continue_Deploy')
                     ]
                     println("-------------------------Inputs provided by user:--------------------------------")
                     JOB.params.Build_Type = userInput["Build_Type"]
                     JOB.params.modules = userInput["Modules"]
                     JOB.tagName = userInput['TAG']
                     JOB.deploy = userInput['Continue_Deploy']
-                    JOB.sonar = userInput['sonar_code_analysis']
 
                     println(JOB.params.modules)
 
@@ -144,13 +138,11 @@ pipeline {
                     JOB.tagName = "${env.BUILD_NUMBER}"
                     JOB.deploy = params.Deploy
                     JOB.tagName = env.BUILD_NUMBER
-                    JOB.sonar = false
 
                     println(JOB.params.Build_Type)
                     println(JOB.params.modules)
                     println(JOB.deploy)
                     println(JOB.tagName)
-                    println(JOB.sonar)
                 }
             }
         }
@@ -180,12 +172,9 @@ pipeline {
             }
 
         }
-        stage('Code analysis by sonar') {
-            when{ expression {JOB.sonar == true}}
+        stage('Build') {
             steps {
                 script {
-                    println("===================================${STAGE_NAME}=============================================")
-
                     def scannerHome = tool 'SonarScanner'
                     withSonarQubeEnv('SonarScanner') {
                         sh "${scannerHome}/bin/sonar-scanner"
@@ -262,15 +251,6 @@ pipeline {
            /usr/bin/ansible-playbook $ANSIBLE_INVENROTY_PATH --extra-vars "registry_region=$REGISTRY_REGION  registry_url=$REGISTRY_URL bot_image=$IMAGE_ID" --user=${ssh_user} -i hosts --private-key ${privatekey}
             '''
                 }
-            }
-        }
-        stage('Run UI tests') {
-            when { expression { JOB.deploy == true } }
-            steps {
-                build job:'terraform_test' , parameters:[
-                        string(name: 'Build_Type',value: 'auto_trigger'),
-                        booleanParam(name: 'Deploy',value:true)
-                ]
             }
         }
     }

@@ -1,6 +1,8 @@
 
 @Library('global_jenkins_functions') _
 
+
+import groovy.time.TimeDuration
 import groovy.transform.Field
 
 
@@ -57,15 +59,7 @@ pipeline {
         ansiColor('xterm')
     }
 
-    agent {
-        docker {
-            label 'linux'
-            image '352708296901.dkr.ecr.eu-central-1.amazonaws.com/alexey_jenk_agent:ubuntu'
-            args  '--user root -v /var/run/docker.sock:/var/run/docker.sock'
-        }
-    }
-
-
+    agent none
 
     environment {
         ANSIBLE_HOST_KEY_CHECKING = "False"
@@ -80,7 +74,6 @@ pipeline {
     }
     stages {
         stage('Get & Print Job Parameters') {
-
             steps {
                 script {
                     def cause = currentBuild.getBuildCauses('hudson.model.Cause$UserIdCause')
@@ -99,9 +92,16 @@ pipeline {
                     }
                 }
             }
+            agent {
+                docker {
+                    label 'linux'
+                    image '352708296901.dkr.ecr.eu-central-1.amazonaws.com/alexey_jenk_agent:final'
+                    args '--user root -v /var/run/docker.sock:/var/run/docker.sock'
+                }
+            }
         }
         stage('Inputs') {
-            when{ expression { params.Build_Type != "auto_trigger"}}
+            when { expression { params.Build_Type != "auto_trigger" } }
             steps {
                 script {
                     println("===================================${STAGE_NAME}=============================================")
@@ -118,7 +118,8 @@ pipeline {
                                       script: [classpath: [], oldScript: '', sandbox: true, script: '''return last_tag.split(",").toList()'''.toString()
                                       ]]],
                             booleanParam(description: 'Click to checkbox if you want to run deploy stages', name: 'Continue_Deploy'),
-                            booleanParam(description: 'Run Code analysis SonarQube', name: 'sonar_code_analysis')
+                            booleanParam(description: 'Run Code analysis SonarQube', name: 'sonar_code_analysis'),
+                            booleanParam(description: 'Run Tests_UI', name: 'test_ui')
                     ]
                     println("-------------------------Inputs provided by user:--------------------------------")
                     JOB.params.Build_Type = userInput["Build_Type"]
@@ -126,16 +127,24 @@ pipeline {
                     JOB.tagName = userInput['TAG']
                     JOB.deploy = userInput['Continue_Deploy']
                     JOB.sonar = userInput['sonar_code_analysis']
+                    JOB.test_ui = userInput['test_ui']
 
                     println(JOB.params.modules)
 
                 }
 
             }
+            agent {
+                docker {
+                    label 'linux'
+                    image '352708296901.dkr.ecr.eu-central-1.amazonaws.com/alexey_jenk_agent:final'
+                    args '--user root -v /var/run/docker.sock:/var/run/docker.sock'
+                }
+            }
         }
 
         stage('Auto input') {
-            when{ expression { params.Build_Type == "auto_trigger"}}
+            when { expression { params.Build_Type == "auto_trigger" } }
 
             steps {
                 script {
@@ -153,6 +162,14 @@ pipeline {
                     println(JOB.sonar)
                 }
             }
+            agent {
+                docker {
+                    label 'linux'
+                    image '352708296901.dkr.ecr.eu-central-1.amazonaws.com/alexey_jenk_agent:final'
+                    args '--user root -v /var/run/docker.sock:/var/run/docker.sock'
+                }
+            }
+
         }
         stage('Set Additional Parameters') {
 
@@ -168,6 +185,14 @@ pipeline {
                     }
                 }
             }
+            agent {
+                docker {
+                    label 'linux'
+                    image '352708296901.dkr.ecr.eu-central-1.amazonaws.com/alexey_jenk_agent:final'
+                    args '--user root -v /var/run/docker.sock:/var/run/docker.sock'
+                }
+            }
+
         }
         stage('Clone') {
             steps {
@@ -178,20 +203,35 @@ pipeline {
                     println("====================${JOB.gitCommitHash}==============")
                 }
             }
+            agent {
+                docker {
+                    label 'linux'
+                    image '352708296901.dkr.ecr.eu-central-1.amazonaws.com/alexey_jenk_agent:final'
+                    args '--user root -v /var/run/docker.sock:/var/run/docker.sock'
+                }
+            }
 
         }
         stage('Code analysis by sonar') {
-            when{ expression {JOB.sonar == true}}
+            when { expression { JOB.sonar == true } }
             steps {
                 script {
                     println("===================================${STAGE_NAME}=============================================")
 
-                    def scannerHome = tool 'SonarScanner'
+                    def scannerHome = tool 'SonarScannerDoc'
                     withSonarQubeEnv('SonarScanner') {
                         sh "${scannerHome}/bin/sonar-scanner"
                     }
                 }
             }
+            agent {
+                docker {
+                    label 'linux'
+                    image '352708296901.dkr.ecr.eu-central-1.amazonaws.com/alexey_jenk_agent:final'
+                    args '--user root -v /var/run/docker.sock:/var/run/docker.sock'
+                }
+            }
+
         }
 
         stage("set git tag") {
@@ -202,6 +242,14 @@ pipeline {
                     JOB.lastCommitMassage = global_gitInfo.getLastCommitMassage()
                 }
             }
+            agent {
+                docker {
+                    label 'linux'
+                    image '352708296901.dkr.ecr.eu-central-1.amazonaws.com/alexey_jenk_agent:final'
+                    args '--user root -v /var/run/docker.sock:/var/run/docker.sock'
+                }
+            }
+
         }
 
         stage("build") {
@@ -225,56 +273,72 @@ pipeline {
 
                 }
             }
-        }
-        stage("Install Ansible") {
-            when{ expression { JOB.deploy == true}}
-            steps {
-                sh'''
-              apt-get update && \
-              apt-get install -y ansible
-            '''
-
-                sh '/usr/bin/ansible-galaxy collection install community.general'
+            agent {
+                docker {
+                    label 'linux'
+                    image '352708296901.dkr.ecr.eu-central-1.amazonaws.com/alexey_jenk_agent:final'
+                    args '--user root -v /var/run/docker.sock:/var/run/docker.sock'
+                }
             }
+
         }
-
         stage("Generate Ansible Inventory") {
-            when{ expression { JOB.deploy == true}}
-
+            when { expression { JOB.deploy == true } }
+            environment {
+                IMAGE_ID = "${env.REGISTRY_URL}/${env.BOT_ECR_NAME}:${JOB.tagName}"
+            }
             steps {
+
+                sh '/usr/local/bin/ansible-galaxy collection install community.general'
                 sh 'aws ec2 describe-instances --region $BOT_EC2_REGION --filters "Name=tag:App,Values=$BOT_EC2_APP_TAG,running" --filters Name=instance-state-name,Values=running --query "Reservations[].Instances[]" > hosts.json'
                 sh 'python3 ${PREPAIR_ANSIBLE_INV_PATH}'
                 sh '''
         echo "Inventory generated"
         cat hosts
         '''
-            }
-        }
-        stage('Ansible Bot Deploy') {
-
-            when{ expression { JOB.deploy == true}}
-            environment {
-                IMAGE_ID = "${env.REGISTRY_URL}/${env.BOT_ECR_NAME}:${JOB.tagName}"
-            }
-            steps {
                 withCredentials([sshUserPrivateKey(credentialsId: "${JOB.ssh_key}", usernameVariable: 'ssh_user', keyFileVariable: 'privatekey')]) {
                     sh '''
-           /usr/bin/ansible-playbook $ANSIBLE_INVENROTY_PATH --extra-vars "registry_region=$REGISTRY_REGION  registry_url=$REGISTRY_URL bot_image=$IMAGE_ID" --user=${ssh_user} -i hosts --private-key ${privatekey}
+           /usr/local/bin/ansible-playbook $ANSIBLE_INVENROTY_PATH --extra-vars "registry_region=$REGISTRY_REGION  registry_url=$REGISTRY_URL bot_image=$IMAGE_ID" --user=${ssh_user} -i hosts --private-key ${privatekey}
             '''
                 }
             }
+            agent {
+                docker {
+                    label 'linux'
+                    image '352708296901.dkr.ecr.eu-central-1.amazonaws.com/alexey_jenk_agent:final'
+                    args '--user root -v /var/run/docker.sock:/var/run/docker.sock'
+                }
+            }
+
         }
-        stage('Run UI tests') {
-            when { expression { JOB.deploy == true } }
+
+        stage("Run UI Tests ") {
+            when { expression { JOB.test_ui == true } }
             steps {
-                build job:'terraform_test' , parameters:[
-                        string(name: 'Build_Type',value: 'auto_trigger'),
-                        booleanParam(name: 'Deploy',value:true)
-                ]
+                println("===================================${STAGE_NAME}=============================================")
+                git branch: "test_project", url: "https://github.com/AlexeyMihaylovDev/selenoid.git"
+                dir('terraform') {
+                    sh "terraform init"
+                    sh "terraform plan -out=myplan.txt"
+                    sh ' terraform apply "myplan.txt"'
+                    sh 'terraform output -json > output.json'
+                    sh 'python3  readJson.py'
+                    sh 'cp ip_output.txt  $WORKSPACE/src/main/resources/'
+
+                }
+                sleep(time:3,unit:"MINUTES")
+                sh 'mvn --version'
+                sh 'mvn clean install -Dsurefire.suiteXmlFiles=Testng_test.xml -Dlog4j.configurationFile=src/main/resources/log4J2.xml'
+                println('Public allure reports')
+                allure includeProperties: false, jdk: '', results: [[path: 'target/allure-results']]
+            }
+            agent {
+                node { label 'linux' }
             }
         }
-    }
 
+
+    }
 
     post {
 
